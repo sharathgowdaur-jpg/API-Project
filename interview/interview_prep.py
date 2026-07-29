@@ -3,40 +3,48 @@ from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
-client = Groq(api_key=os.getenv("API_KEY"))
 
-def generate_function(job_role,experince_level,skills,num_questions=10):
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def generate_function(job_role, experience_level, skills, num_questions=10):
+
     prompt = f"""
-    You are an expert interviewer. Generate {num_questions} interview questions for a {experince_level} {job_role} with the following skills: {skills}. 
-    The questions should be challenging and relevant to the job role and skills provided. 
-    Please provide the questions in a numbered list format.
+You are an expert interviewer.
 
-    distribution of questions should be as follows:
-    - 50% technical questions related to their skills
-    - 30% behavioral questions (start with "Tell me about a time when...")
-    - 20% situational questions (start with "what would you do if ...")
+Generate {num_questions} interview questions for a
+{experience_level} {job_role}
+with the following skills: {skills}.
 
-    for each each question follow the exact format:
-    Q[number]: [question]
-        TYPE:[technical / behavioral / situational]
-        difficulty: [easy / medium / hard]
-        good_answer: [3-4 keywords or concepts,comma separated]
-        Make question specific to the skills.Do not ask generic quesions make difficulty increase gradually from easy to high 
-    """
+Distribution:
+- 50% Technical
+- 30% Behavioral (start with "Tell me about a time when...")
+- 20% Situational (start with "What would you do if...")
+
+For each question use exactly this format:
+
+Q[number]: [Question]
+
+TYPE: Technical / Behavioral / Situational
+
+DIFFICULTY: Easy / Medium / Hard
+
+GOOD_ANSWER: keyword1, keyword2, keyword3
+"""
 
     response = client.chat.completions.create(
-        model = "llam-3.3-70b-versatile",
-        messages = [
+        model="llama-3.3-70b-versatile",
+        messages=[
             {
-                "role" : "system",
-                "content" : "you are an expert interviewer specializing {job_role} roles.Generate questions that accurately reflect what top companies ask"
+                "role": "system",
+                "content": f"You are an expert interviewer specializing in {job_role} roles."
             },
             {
-                "role" : "user",
-            "content" : prompt
+                "role": "user",
+                "content": prompt
             }
         ],
-        temperature = 0.7,
+        temperature=0.7,
+        max_completion_tokens=2048,
     )
 
     return response.choices[0].message.content
