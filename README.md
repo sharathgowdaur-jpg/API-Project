@@ -226,7 +226,7 @@ Linux/macOS
 source venv/bin/activate
 ```
 
----
+
 
 # 📚 Technologies Used
 
